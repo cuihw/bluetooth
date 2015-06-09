@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="angle">
+        <item>90</item>
+        <item>60</item>
+        <item>45</item>
+        <item>30</item>
+        <item>0</item>
+        <item>-30</item>
+        <item>-45</item>
+        <item>-60</item>
+        <item>-90</item>
+    </string-array>
+    <string-array name="postion">
+        <item>顶面</item>
+        <item>侧面</item>
+        <item>底面</item>
+    </string-array>
+
+    <string-array name="uer_boolean">
+        <item>是</item>
+        <item>否</item>
+    </string-array>
+    
+    
+    <string-array name="strength">
+        <item>C15</item>
+        <item>C20</item>
+        <item>C30</item>
+        <item>C35</item>
+        <item>C40</item>
+        <item>C45</item>
+        <item>C50</item>
+    </string-array>
+</resources>

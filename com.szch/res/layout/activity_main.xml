@@ -9,7 +9,7 @@
     tools:context=".MainActivity" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/textview_construct"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -19,44 +19,185 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/editText_construct"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_marginLeft="14dp"
-        android:layout_toRightOf="@+id/textView1"
+        android:layout_alignBaseline="@+id/textview_construct"
+        android:layout_alignBottom="@+id/textview_construct"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/textview_construct"
         android:ems="10" >
-
     </EditText>
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textview_testnumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="17dp"
-        android:text="测区数："
+        android:layout_alignLeft="@+id/textview_construct"
+        android:layout_below="@+id/textview_construct"
+        android:layout_marginTop="10dp"
+        android:text="测区数 ："
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/edittext_testnumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView2"
-        android:layout_alignBottom="@+id/textView2"
-        android:layout_alignLeft="@+id/editText1"
-        android:ems="10" />
+        android:layout_alignLeft="@+id/editText_construct"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/textview_testnumber"
+        android:ems="10"
+        android:hint="@string/test_number_hint"
+        android:inputType="numberDecimal" >
+    </EditText>
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/textview_angle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/editText2"
-        android:layout_marginTop="22dp"
+        android:layout_alignLeft="@+id/textview_testnumber"
+        android:layout_below="@+id/edittext_testnumber"
         android:text="角度："
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinner_angle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/edittext_testnumber"
+        android:layout_alignTop="@+id/textview_angle"
+        android:entries="@array/angle" />
+
+    <TextView
+        android:id="@+id/textview_test_postion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_angle"
+        android:layout_below="@id/textview_angle"
+        android:layout_marginTop="10dp"
+        android:text="测试面："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinner_test_postion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinner_angle"
+        android:layout_alignTop="@+id/textview_test_postion"
+        android:entries="@array/postion" />
+
+    <TextView
+        android:id="@+id/textview_machine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_test_postion"
+        android:layout_below="@id/textview_test_postion"
+        android:layout_marginTop="10dp"
+        android:text="是否泵送："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinner_machine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinner_test_postion"
+        android:layout_alignTop="@+id/textview_machine"
+        android:entries="@array/uer_boolean" />
+
+    <TextView
+        android:id="@+id/textview_strength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_machine"
+        android:layout_below="@id/textview_machine"
+        android:layout_marginTop="10dp"
+        android:text="设计强度："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinner_strength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinner_machine"
+        android:layout_alignTop="@+id/textview_strength"
+        android:entries="@array/strength" />
+
+    <!--
+        测试日期：用户自己输入
+       炭化修正：数字输入0~6.0
+       强度修正量;数字输入
+    -->
+
+    <TextView
+        android:id="@+id/textview_tanhua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_strength"
+        android:layout_below="@id/textview_strength"
+        android:layout_marginTop="10dp"
+        android:text="炭化修正："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/edittext_tanhua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spinner_strength"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/textview_tanhua"
+        android:ems="10"
+        android:hint="@string/tanhuaxiuzheng_hint"
+        android:inputType="numberDecimal" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/textview_fix_strength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_tanhua"
+        android:layout_below="@id/textview_tanhua"
+        android:layout_marginTop="10dp"
+        android:text="强度修正量："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/edittext_tanhua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/textview_fix_strength"
+        android:layout_toRightOf="@+id/textview_fix_strength"
+        android:ems="10"
+        android:inputType="numberDecimal" >
+    </EditText>
+    
+    <TextView
+        android:id="@+id/textview_test_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textview_fix_strength"
+        android:layout_below="@id/textview_fix_strength"
+        android:layout_marginTop="10dp"
+        android:text="测试日期："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/edittext_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/textview_test_date"
+        android:layout_alignLeft="@+id/edittext_testnumber"
+        android:lines="1"
+        android:ems="10">
+    </EditText>
+
+    <Button
+        android:id="@+id/start_test"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textview_test_date"
+        android:layout_marginTop="15dp"
+        android:text="开始测试" />
 
 </RelativeLayout>
