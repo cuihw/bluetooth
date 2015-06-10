@@ -123,9 +123,9 @@
         android:entries="@array/strength" />
 
     <!--
-        测试日期：用户自己输入
        炭化修正：数字输入0~6.0
        强度修正量;数字输入
+       测试日期：用户自己输入
     -->
 
     <TextView
@@ -161,7 +161,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/edittext_tanhua"
+        android:id="@+id/edittext_fix_strength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
