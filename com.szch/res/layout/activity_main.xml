@@ -198,6 +198,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textview_test_date"
         android:layout_marginTop="15dp"
+        android:onClick="start_test"
         android:text="开始测试" />
 
 </RelativeLayout>
