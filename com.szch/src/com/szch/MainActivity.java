@@ -113,7 +113,6 @@ public class MainActivity extends Activity {
         mEditTextDate = (EditText) findViewById(R.id.edittext_date);
 
     }
-    
 
     private OnItemSelectedListener mMachineSpinnerListener = new OnItemSelectedListener() {
 
