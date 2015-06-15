@@ -33,9 +33,12 @@ public class BlueToothConnect {
 
     private static final String NAME_SECURE = "name_secure";
 
-    public static final int NO_PAIRED_DEVICES = 1;
+    protected static final String TAG = "BlueToothConnect";
 
-    protected static final String TAG = null;
+    public static final int READ_DATA = 1;
+
+    public static final int NO_PAIRED_DEVICES = 2;
+    
 
     BluetoothServerSocket mBluetoothServerSocket;
 
@@ -71,7 +74,7 @@ public class BlueToothConnect {
             }
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
     }
@@ -100,6 +103,9 @@ public class BlueToothConnect {
                             is.read(buffer);
                             Log.d(TAG, "buffer = " + new String(buffer));
                         }
+
+                        
+                        notifyNewData();
                     }
 
                 } catch (IOException e) {
@@ -113,6 +119,14 @@ public class BlueToothConnect {
 
     }
 
+    private void notifyNewData() {
+        Message msg = mHandler.obtainMessage(READ_DATA);
+        
+        
+        
+    }
+
+    
     public static BlueToothConnect getInstence(Context c, Handler h) {
         if (mInstence == null) {
             mInstence = new BlueToothConnect(c, h);

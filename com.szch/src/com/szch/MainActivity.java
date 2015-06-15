@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
     private EditText mEditText_Construct;
 
     private EditText mEditTextTestAreaNumber;
-    
+
     private EditText mEditTextTanhua;
 
     private Spinner mAngleSpinner;
@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     private Spinner mPostionSpinner;
 
     private Spinner mMachineSpinner;
-    
+
     private Spinner mStrengthSpiner;
 
     private EditText mEditTextFixStrength;
@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
     private float mCarbonizeStrength = 0;
 
     private int mFixStrength;
-    
+
     private String mDate;
 
     private void saveDataPreferences() {
@@ -70,7 +70,21 @@ public class MainActivity extends Activity {
         PreferencesData.setIntData(this, PreferencesData.FIX_STRENGTH, mFixStrength);
         PreferencesData.setStringData(this, PreferencesData.DATE, mDate);
     }
-    
+
+
+    private void setData(Intent intent) {
+
+        intent.putExtra(PreferencesData.CONSTRUCTION_NAME, mConstructionName);
+        intent.putExtra(PreferencesData.TEST_AREA_NUMBER, mTestNumber);
+        intent.putExtra(PreferencesData.TEST_ANGLE, mTestAngle);
+        intent.putExtra(PreferencesData.TEST_POSTION, mPostion);
+        intent.putExtra(PreferencesData.IS_MACHINE, isMachine);
+        intent.putExtra(PreferencesData.DESGIN_STRENGTH, mDesginStrength);
+        intent.putExtra(PreferencesData.CARBONIZE, mCarbonizeStrength);
+        intent.putExtra(PreferencesData.FIX_STRENGTH, mFixStrength);
+        intent.putExtra(PreferencesData.DATE, mDate);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,39 +104,37 @@ public class MainActivity extends Activity {
         mEditTextTestAreaNumber = (EditText) findViewById(R.id.edittext_testnumber);
 
         mEditText_Construct = (EditText) findViewById(R.id.editText_construct);
-        
+
         mAngleSpinner = (Spinner) findViewById(R.id.spinner_angle);
-        
+
         mAngleSpinner.setOnItemSelectedListener(mAngleSpinnerListener);
 
 
         mPostionSpinner = (Spinner) findViewById(R.id.spinner_test_postion);
         mPostion = getResources().getStringArray(R.array.postion)[0];
         mPostionSpinner.setOnItemSelectedListener(mPostionSpinnerListener);
-        
+
         mMachineSpinner = (Spinner) findViewById(R.id.spinner_machine);
         mMachineSpinner.setOnItemSelectedListener(mMachineSpinnerListener);
 
         mStrengthSpiner = (Spinner) findViewById(R.id.spinner_strength);
         mStrengthSpiner.setOnItemSelectedListener(mStrengthSpinnerListener);
-        
+
         mEditTextTanhua = (EditText) findViewById(R.id.edittext_tanhua);
-        
+
         mEditTextFixStrength = (EditText) findViewById(R.id.edittext_fix_strength);
 
         mEditTextDate = (EditText) findViewById(R.id.edittext_date);
 
     }
-    
 
     private OnItemSelectedListener mMachineSpinnerListener = new OnItemSelectedListener() {
 
         @Override
-        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-                long arg3) {
-            
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+
             if (arg2 == 0) {
-                isMachine = true;                
+                isMachine = true;
             } else {
                 isMachine = false;
             }
@@ -132,17 +144,16 @@ public class MainActivity extends Activity {
         @Override
         public void onNothingSelected(AdapterView<?> arg0) {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     };
 
 
-    private OnItemSelectedListener mStrengthSpinnerListener = new OnItemSelectedListener(){
+    private OnItemSelectedListener mStrengthSpinnerListener = new OnItemSelectedListener() {
 
         @Override
-        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-                long arg3) {
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 
             String[] strengh = getResources().getStringArray(R.array.strength);
             mDesginStrength = strengh[arg2];
@@ -152,11 +163,11 @@ public class MainActivity extends Activity {
         public void onNothingSelected(AdapterView<?> arg0) {
 
         }
-        
+
     };
 
-    
-    private OnItemSelectedListener mAngleSpinnerListener = new OnItemSelectedListener(){
+
+    private OnItemSelectedListener mAngleSpinnerListener = new OnItemSelectedListener() {
 
         @Override
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -168,10 +179,11 @@ public class MainActivity extends Activity {
 
         @Override
         public void onNothingSelected(AdapterView<?> arg0) {
-            
-        }};
-        
-     OnItemSelectedListener mPostionSpinnerListener  = new OnItemSelectedListener(){
+
+        }
+    };
+
+    OnItemSelectedListener mPostionSpinnerListener = new OnItemSelectedListener() {
 
         @Override
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -189,7 +201,7 @@ public class MainActivity extends Activity {
         public void onNothingSelected(AdapterView<?> arg0) {
             // TODO Auto-generated method stub
         }
-     };
+    };
 
 
     public void start_test(View view) {
@@ -203,14 +215,17 @@ public class MainActivity extends Activity {
             Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_LONG).show();
             return;
         }
-        
+
         saveDataPreferences();
-        
+
 
         Intent intent = new Intent(this, TestActivity.class);
-        
+
+        setData(intent);
+
         startActivity(intent);
     }
+
 
     private String checkValue() {
 
@@ -240,25 +255,25 @@ public class MainActivity extends Activity {
             errorString = "请出入正确的测区数。";
             return errorString;
         }
-        
+
         String strTanHua = mEditTextTanhua.getText().toString().trim();
-        
+
         mCarbonizeStrength = 0.0f;
         try {
 
-            Float.parseFloat(strTanHua);
+            mCarbonizeStrength = Float.parseFloat(strTanHua);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             Log.d(TAG, "NumberFormatException");
         }
-        
+
         if (mCarbonizeStrength > 6.0 || mCarbonizeStrength < 0.0f) {
             errorString = "请出入正确的碳化强度参数";
             return errorString;
         }
 
         String fixStrength = mEditTextFixStrength.getText().toString().trim();
-        
+
         mFixStrength = 0;
 
         try {
