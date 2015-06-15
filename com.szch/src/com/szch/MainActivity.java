@@ -261,7 +261,7 @@ public class MainActivity extends Activity {
         mCarbonizeStrength = 0.0f;
         try {
 
-            Float.parseFloat(strTanHua);
+            mCarbonizeStrength = Float.parseFloat(strTanHua);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             Log.d(TAG, "NumberFormatException");

@@ -8,6 +8,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.bluetooth.connect.BlueToothConnect;
 import com.szch.data.PreferencesData;
 
 public class TestActivity extends Activity {
@@ -68,7 +71,24 @@ public class TestActivity extends Activity {
 
         initView();
 
+        connectBluetoothDevice ();
     }
+
+    BlueToothConnect mBlueToothConnect;
+
+    private void connectBluetoothDevice() {
+        mBlueToothConnect = BlueToothConnect.getInstence(this, mHandler);
+    }
+    
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            super.handleMessage(msg);
+        }
+        
+    };
 
     private void getTestParam(Intent intent) {
         mConstructionName = intent.getStringExtra(PreferencesData.CONSTRUCTION_NAME);
@@ -82,7 +102,6 @@ public class TestActivity extends Activity {
         mDate = intent.getStringExtra(PreferencesData.DATE);
     }
 
-
     private void initView() {
 
         TextView testparam = (TextView) findViewById(R.id.test_param);
@@ -92,10 +111,6 @@ public class TestActivity extends Activity {
                 + "\n碳化修正：" + mCarbonizeStrength + "    强度修正量：" + mFixStrength + "\n 测试日期：" + mDate);
 
         mGridview = (GridView) findViewById(R.id.gridView1);
-
-//        mSimpleAdapter =
-//                new SimpleAdapter(this, lstItem, R.layout.grid_item, new String[] {"ItemText"},
-//                        new int[] {R.id.button1});
 
         mGridViewAdpter = new GridViewAdpter(arrayData);
 
