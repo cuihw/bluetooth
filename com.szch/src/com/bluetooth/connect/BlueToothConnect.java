@@ -2,7 +2,10 @@ package com.bluetooth.connect;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,10 +29,12 @@ public class BlueToothConnect {
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter
             .getDefaultAdapter();
 
+
     private static Handler mHandler;
 
     private static final UUID MY_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
+                       //00001101-0000-1000-8000-00805F9B34FB"
 
     private static final String NAME_SECURE = "name_secure";
 
@@ -38,11 +43,11 @@ public class BlueToothConnect {
     public static final int READ_DATA = 1;
 
     public static final int NO_PAIRED_DEVICES = 2;
-    
 
     BluetoothServerSocket mBluetoothServerSocket;
 
     private void init() {
+
         if (!bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.enable();
         }
@@ -53,21 +58,63 @@ public class BlueToothConnect {
 
         Set<BluetoothDevice> pairedList = bluetoothAdapter.getBondedDevices();
 
+        Log.d(TAG, "paired devices is " + pairedList.size());
+
         if (pairedList.size() == 0) {
             Message msg = mHandler.obtainMessage(NO_PAIRED_DEVICES);
             mHandler.sendMessage(msg);
         }
+        
+        Iterator iter = pairedList.iterator();
+        while(iter.hasNext()){
 
-        connectDevices();
+            BluetoothDevice bluetoothDevice = (BluetoothDevice) iter.next();
+
+            
+            Log.d(TAG, "BluetoothDevice " + bluetoothDevice);
+
+            if (bluetoothDevice != null) {
+                connectToDevices (bluetoothDevice);
+                break;
+            }
+        }
+        
+        //listenConnectDevices();
 
     }
 
-    private void connectDevices() {
+    private void connectToDevices(BluetoothDevice bluetoothDevice) {
+
+        Log.d(TAG, "connectToDevices()....... ");
+        BluetoothSocket socket = null;
         try {
+         socket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
+
+         socket.connect();
+         
+         startReadingThread(socket);
+
+         } catch (IOException e) {
+
+             e.printStackTrace();
+             
+         }
+    }
+
+    private void listenConnectDevices() {
+
+        Log.d(TAG, "listenConnectDevices()....... ");
+        BluetoothSocket socket = null;
+        
+        try {
+
             mBluetoothServerSocket = bluetoothAdapter
                     .listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID);
 
-            BluetoothSocket socket = mBluetoothServerSocket.accept();
+
+            socket = mBluetoothServerSocket.accept();
+
+            Log.d(TAG, "socket " + socket);
 
             if (socket != null) {
                 startReadingThread(socket);
@@ -75,8 +122,15 @@ public class BlueToothConnect {
 
         } catch (IOException e) {
 
+            Log.d(TAG, "socket ");
             e.printStackTrace();
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
+
     }
 
     private boolean stop = false;
@@ -95,16 +149,21 @@ public class BlueToothConnect {
                         if (stop) {
                             break;
                         }
+
                         byte[] buffer = new byte[256];
 
                         int length = is.read();
 
                         if (length > 0) {
                             is.read(buffer);
+                            
+                            for (int i =0 ; i < length; i ++) {
+                                Log.d(TAG, "buffer [" + i + "] = " + buffer[i]);
+                            }
+
                             Log.d(TAG, "buffer = " + new String(buffer));
                         }
 
-                        
                         notifyNewData();
                     }
 
@@ -121,13 +180,13 @@ public class BlueToothConnect {
 
     private void notifyNewData() {
         Message msg = mHandler.obtainMessage(READ_DATA);
-        
-        
-        
+
     }
 
-    
     public static BlueToothConnect getInstence(Context c, Handler h) {
+        
+        printAllInform(BluetoothAdapter.class);
+
         if (mInstence == null) {
             mInstence = new BlueToothConnect(c, h);
         }
@@ -150,28 +209,28 @@ public class BlueToothConnect {
         }).start();
     }
 
-    // 广播接收器
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
             if (BluetoothTools.ACTION_NOT_FOUND_SERVER.equals(action)) {
-                // 未发现设备
+ 
                 // serversText.append("not found device\r\n");
 
             } else if (BluetoothTools.ACTION_FOUND_DEVICE.equals(action)) {
-                // 获取到设备对象
+
                 BluetoothDevice device = (BluetoothDevice) intent.getExtras()
                         .get(BluetoothTools.DEVICE);
                 // deviceList.add(device);
                 // serversText.append(device.getName() + "\r\n");
 
             } else if (BluetoothTools.ACTION_CONNECT_SUCCESS.equals(action)) {
-                // 连接成功
+
 
             } else if (BluetoothTools.ACTION_DATA_TO_GAME.equals(action)) {
-                // 接收数据
+
                 TransmitBean data = (TransmitBean) intent.getExtras()
                         .getSerializable(BluetoothTools.DATA);
                 String msg = "from remote " + new Date().toLocaleString()
@@ -180,4 +239,26 @@ public class BlueToothConnect {
             }
         }
     };
+
+    static public void printAllInform(Class clsShow) {
+        try {
+            // get all method
+            Method[] hideMethod = clsShow.getMethods();
+            int i = 0;
+            for (; i < hideMethod.length; i++) {
+                Log.e("method name", hideMethod[i].getName());
+            }
+            // get all field
+            Field[] allFields = clsShow.getFields();
+            for (i = 0; i < allFields.length; i++) {
+                Log.e("Field name", allFields[i].getName());
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

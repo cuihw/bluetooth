@@ -106,7 +106,7 @@ public class TestActivity extends Activity {
 
         TextView testparam = (TextView) findViewById(R.id.test_param);
 
-        testparam.setText("构件名称： " + mConstructionName + "    测区数：" + mTestNumber + "\n测试角度： " + mTestAngle
+        testparam.setText("构件名称： " + mConstructionName + "\n测区数：" + mTestNumber + "    测试角度： " + mTestAngle
                 + "   测试方位：" + mPostion + "\n是否泵送：" + (isMachine ? "是" : "否") + "    设计强度：" + mDesginStrength
                 + "\n碳化修正：" + mCarbonizeStrength + "    强度修正量：" + mFixStrength + "\n 测试日期：" + mDate);
 
