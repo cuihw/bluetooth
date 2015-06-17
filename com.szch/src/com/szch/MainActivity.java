@@ -71,6 +71,19 @@ public class MainActivity extends Activity {
         PreferencesData.setStringData(this, PreferencesData.DATE, mDate);
     }
 
+    private void getDataPreferences() {
+        mConstructionName = PreferencesData.getStringData(this, PreferencesData.CONSTRUCTION_NAME, null);
+        mTestNumber = PreferencesData.getIntData(this, PreferencesData.TEST_AREA_NUMBER, 5);
+        mTestAngle = PreferencesData.getIntData(this, PreferencesData.TEST_ANGLE, 90);
+        mPostion = PreferencesData.getStringData(this, PreferencesData.TEST_POSTION, mPostion);
+        isMachine = PreferencesData.getBooleanData(this, PreferencesData.IS_MACHINE, isMachine);
+        mDesginStrength = PreferencesData.getStringData(this, PreferencesData.DESGIN_STRENGTH, mDesginStrength);
+        mCarbonizeStrength = PreferencesData.getfloatData(this, PreferencesData.CARBONIZE, mCarbonizeStrength);
+        mFixStrength = PreferencesData.getIntData(this, PreferencesData.FIX_STRENGTH, mFixStrength);
+        mDate = PreferencesData.getStringData(this, PreferencesData.DATE, mDate);
+    }
+
+
 
     private void setData(Intent intent) {
 

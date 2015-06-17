@@ -16,6 +16,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -45,11 +46,22 @@ public class BlueToothConnect {
     public static final int NO_PAIRED_DEVICES = 2;
 
     BluetoothServerSocket mBluetoothServerSocket;
+    
+    private void registerBluetooth() {
+        IntentFilter intent = new IntentFilter();  
+        intent.addAction(BluetoothDevice.ACTION_FOUND);  
+        intent.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);  
+        intent.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);  
+        intent.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);  
+        mContext.registerReceiver(broadcastReceiver, intent);
+        
+    }
 
     private void init() {
 
         if (!bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.enable();
+            registerBluetooth();
         }
 
         if (bluetoothAdapter.isDiscovering()) {
@@ -66,11 +78,11 @@ public class BlueToothConnect {
         }
         
         Iterator iter = pairedList.iterator();
+
         while(iter.hasNext()){
 
             BluetoothDevice bluetoothDevice = (BluetoothDevice) iter.next();
 
-            
             Log.d(TAG, "BluetoothDevice " + bluetoothDevice);
 
             if (bluetoothDevice != null) {
@@ -78,9 +90,6 @@ public class BlueToothConnect {
                 break;
             }
         }
-        
-        //listenConnectDevices();
-
     }
 
     private void connectToDevices(BluetoothDevice bluetoothDevice) {
@@ -110,7 +119,6 @@ public class BlueToothConnect {
 
             mBluetoothServerSocket = bluetoothAdapter
                     .listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID);
-
 
             socket = mBluetoothServerSocket.accept();
 
@@ -163,7 +171,7 @@ public class BlueToothConnect {
 
                             Log.d(TAG, "buffer = " + new String(buffer));
                         }
-
+                        
                         notifyNewData();
                     }
 
@@ -180,7 +188,8 @@ public class BlueToothConnect {
 
     private void notifyNewData() {
         Message msg = mHandler.obtainMessage(READ_DATA);
-
+        msg.arg1 = 80;
+        mHandler.sendMessage(msg);
     }
 
     public static BlueToothConnect getInstence(Context c, Handler h) {
@@ -214,29 +223,29 @@ public class BlueToothConnect {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
-            if (BluetoothTools.ACTION_NOT_FOUND_SERVER.equals(action)) {
- 
-                // serversText.append("not found device\r\n");
-
-            } else if (BluetoothTools.ACTION_FOUND_DEVICE.equals(action)) {
-
-                BluetoothDevice device = (BluetoothDevice) intent.getExtras()
-                        .get(BluetoothTools.DEVICE);
-                // deviceList.add(device);
-                // serversText.append(device.getName() + "\r\n");
-
-            } else if (BluetoothTools.ACTION_CONNECT_SUCCESS.equals(action)) {
-
-
-            } else if (BluetoothTools.ACTION_DATA_TO_GAME.equals(action)) {
-
-                TransmitBean data = (TransmitBean) intent.getExtras()
-                        .getSerializable(BluetoothTools.DATA);
-                String msg = "from remote " + new Date().toLocaleString()
-                        + " :\r\n" + data.getMsg() + "\r\n";
-
+            
+            if (BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)) {
+                Log.d(TAG, "ACTION_CONNECTION_STATE_CHANGED");
+                if (BluetoothAdapter.STATE_CONNECTED ==bluetoothAdapter.getState()) {
+                    Log.d(TAG, "STATE_CONNECTED");
+                }
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);  
+                switch (device.getBondState()) {  
+                case BluetoothDevice.BOND_BONDING:  
+                    Log.d("BlueToothTestActivity", "BOND_BONDING......");  
+                    break;  
+                case BluetoothDevice.BOND_BONDED:  
+                    Log.d("BlueToothTestActivity", "BOND_BONDED");  
+                    connectToDevices(device);
+                    break;  
+                case BluetoothDevice.BOND_NONE:  
+                    Log.d("BlueToothTestActivity", "cancel BOND_NONE");  
+                default:  
+                    break;  
+                }  
             }
+
+
         }
     };
 
@@ -246,12 +255,12 @@ public class BlueToothConnect {
             Method[] hideMethod = clsShow.getMethods();
             int i = 0;
             for (; i < hideMethod.length; i++) {
-                Log.e("method name", hideMethod[i].getName());
+                Log.d("method name", hideMethod[i].getName());
             }
             // get all field
             Field[] allFields = clsShow.getFields();
             for (i = 0; i < allFields.length; i++) {
-                Log.e("Field name", allFields[i].getName());
+                Log.d("Field name", allFields[i].getName());
             }
         } catch (SecurityException e) {
             e.printStackTrace();

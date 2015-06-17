@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -35,6 +36,10 @@ public class TestActivity extends Activity {
 
     SimpleAdapter mSimpleAdapter;
     GridViewAdpter mGridViewAdpter;
+    
+    private List<Integer> testdata = new ArrayList<Integer>();
+    
+    TextView mTextViewTestArea;
 
     private String mConstructionName;
 
@@ -84,7 +89,17 @@ public class TestActivity extends Activity {
 
         @Override
         public void handleMessage(Message msg) {
-            // TODO Auto-generated method stub
+            switch(msg.what) {
+                case BlueToothConnect.READ_DATA:
+                    int data = msg.arg1;
+                    fillData(data);
+                    break;
+                case BlueToothConnect.NO_PAIRED_DEVICES:
+                    
+                    break;
+            }
+            
+            
             super.handleMessage(msg);
         }
         
@@ -102,6 +117,32 @@ public class TestActivity extends Activity {
         mDate = intent.getStringExtra(PreferencesData.DATE);
     }
 
+    protected void fillData(int data) {
+
+        if (testdata.size() > 15) {
+            testdata.remove(15);
+        }
+
+        if (mGridItemSelected < testdata.size()) {
+
+            testdata.add(mGridItemSelected, data);
+
+            if (mGridItemSelected < 15) {
+                mGridItemSelected ++;   
+            }
+
+        } else {
+            testdata.add(data);
+
+            mGridItemSelected = testdata.size();
+            if (mGridItemSelected > 15) {
+                testdata.add(mGridItemSelected, data);
+                mGridItemSelected = 15;
+            }
+        }
+        setSelectItem(mGridItemSelected);
+    }
+
     private void initView() {
 
         TextView testparam = (TextView) findViewById(R.id.test_param);
@@ -113,6 +154,8 @@ public class TestActivity extends Activity {
         mGridview = (GridView) findViewById(R.id.gridView1);
 
         mGridViewAdpter = new GridViewAdpter(arrayData);
+
+        mTextViewTestArea = (TextView) findViewById(R.id.test_area_index);
 
         mGridview.setAdapter(mGridViewAdpter);
 
@@ -149,7 +192,6 @@ public class TestActivity extends Activity {
 
         @Override
         public int getCount() {
-
             return arrayData.length;
         }
 
@@ -192,9 +234,7 @@ public class TestActivity extends Activity {
             if (selected == position) {
                 vh.textview.setSelected(true);
                 vh.textview.setBackgroundResource(R.drawable.item_selected);
-
             } else {
-
                 vh.textview.setSelected(false);
                 vh.textview.setBackgroundResource(R.drawable.item_selector);
             }
