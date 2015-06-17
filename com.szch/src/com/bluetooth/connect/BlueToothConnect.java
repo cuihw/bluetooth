@@ -30,7 +30,6 @@ public class BlueToothConnect {
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter
             .getDefaultAdapter();
 
-
     private static Handler mHandler;
 
     private static final UUID MY_UUID = UUID
@@ -44,6 +43,8 @@ public class BlueToothConnect {
     public static final int READ_DATA = 1;
 
     public static final int NO_PAIRED_DEVICES = 2;
+    
+    private BluetoothSocket mBluetoothSocket;
 
     BluetoothServerSocket mBluetoothServerSocket;
     
@@ -52,80 +53,92 @@ public class BlueToothConnect {
         intent.addAction(BluetoothDevice.ACTION_FOUND);  
         intent.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);  
         intent.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);  
-        intent.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);  
+        intent.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+
         mContext.registerReceiver(broadcastReceiver, intent);
-        
     }
 
-    private void init() {
+    public void init() {
 
-        if (!bluetoothAdapter.isEnabled()) {
-            bluetoothAdapter.enable();
-            registerBluetooth();
-        }
+        registerBluetooth();
 
-        if (bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
-        }
+        new Thread(new Runnable() {
 
-        Set<BluetoothDevice> pairedList = bluetoothAdapter.getBondedDevices();
+            @Override
+            public void run() {
 
-        Log.d(TAG, "paired devices is " + pairedList.size());
+                if (!bluetoothAdapter.isEnabled()) {
+                    bluetoothAdapter.enable();
+                }
 
-        if (pairedList.size() == 0) {
-            Message msg = mHandler.obtainMessage(NO_PAIRED_DEVICES);
-            mHandler.sendMessage(msg);
-        }
-        
-        Iterator iter = pairedList.iterator();
+                if (bluetoothAdapter.isDiscovering()) {
+                    bluetoothAdapter.cancelDiscovery();
+                }
 
-        while(iter.hasNext()){
+                Set<BluetoothDevice> pairedList = bluetoothAdapter.getBondedDevices();
 
-            BluetoothDevice bluetoothDevice = (BluetoothDevice) iter.next();
+                Log.d(TAG, "paired devices is " + pairedList.size());
 
-            Log.d(TAG, "BluetoothDevice " + bluetoothDevice);
+                if (pairedList.size() == 0) {
+                    Message msg = mHandler.obtainMessage(NO_PAIRED_DEVICES);
+                    mHandler.sendMessage(msg);
+                }
 
-            if (bluetoothDevice != null) {
-                connectToDevices (bluetoothDevice);
-                break;
+                Iterator iter = pairedList.iterator();
+
+                while(iter.hasNext()){
+
+                    BluetoothDevice bluetoothDevice = (BluetoothDevice) iter.next();
+
+                    Log.d(TAG, "BluetoothDevice " + bluetoothDevice + ", name:" + bluetoothDevice.getName());
+
+                    if (bluetoothDevice != null) {
+                        connectToDevices (bluetoothDevice);
+                        break;
+                    }
+                }
             }
-        }
+        }).start();
     }
 
     private void connectToDevices(BluetoothDevice bluetoothDevice) {
 
         Log.d(TAG, "connectToDevices()....... ");
-        BluetoothSocket socket = null;
+        mBluetoothSocket = null;
         try {
-         socket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            mBluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
 
-         socket.connect();
+            mBluetoothSocket.connect();
          
-         startReadingThread(socket);
+         startReadingThread(mBluetoothSocket);
 
-         } catch (IOException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                mBluetoothSocket.close();
+            } catch (IOException e1) {
 
-             e.printStackTrace();
-             
-         }
+                e1.printStackTrace();
+            }
+        }
     }
 
     private void listenConnectDevices() {
 
         Log.d(TAG, "listenConnectDevices()....... ");
-        BluetoothSocket socket = null;
+        mBluetoothSocket = null;
         
         try {
 
             mBluetoothServerSocket = bluetoothAdapter
                     .listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID);
 
-            socket = mBluetoothServerSocket.accept();
+            mBluetoothSocket = mBluetoothServerSocket.accept();
 
-            Log.d(TAG, "socket " + socket);
+            Log.d(TAG, "socket " + mBluetoothSocket);
 
-            if (socket != null) {
-                startReadingThread(socket);
+            if (mBluetoothSocket != null) {
+                startReadingThread(mBluetoothSocket);
             }
 
         } catch (IOException e) {
@@ -133,7 +146,7 @@ public class BlueToothConnect {
             Log.d(TAG, "socket ");
             e.printStackTrace();
             try {
-                socket.close();
+                mBluetoothSocket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -176,8 +189,14 @@ public class BlueToothConnect {
                     }
 
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
+
                     e.printStackTrace();
+
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
 
             }
@@ -193,8 +212,8 @@ public class BlueToothConnect {
     }
 
     public static BlueToothConnect getInstence(Context c, Handler h) {
-        
-        printAllInform(BluetoothAdapter.class);
+
+        //printAllInform(BluetoothAdapter.class);
 
         if (mInstence == null) {
             mInstence = new BlueToothConnect(c, h);
@@ -206,17 +225,9 @@ public class BlueToothConnect {
     private BlueToothConnect(Context c, Handler h) {
         mContext = c;
         mHandler = h;
-
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                init();
-
-            }
-        }).start();
     }
+    
+    
 
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -224,28 +235,48 @@ public class BlueToothConnect {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             
-            if (BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)) {
-                Log.d(TAG, "ACTION_CONNECTION_STATE_CHANGED");
-                if (BluetoothAdapter.STATE_CONNECTED ==bluetoothAdapter.getState()) {
-                    Log.d(TAG, "STATE_CONNECTED");
-                }
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);  
-                switch (device.getBondState()) {  
-                case BluetoothDevice.BOND_BONDING:  
-                    Log.d("BlueToothTestActivity", "BOND_BONDING......");  
-                    break;  
-                case BluetoothDevice.BOND_BONDED:  
-                    Log.d("BlueToothTestActivity", "BOND_BONDED");  
-                    connectToDevices(device);
-                    break;  
-                case BluetoothDevice.BOND_NONE:  
-                    Log.d("BlueToothTestActivity", "cancel BOND_NONE");  
-                default:  
-                    break;  
-                }  
+//            if (BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)) {
+//                Log.d(TAG, "ACTION_CONNECTION_STATE_CHANGED");
+//                if (BluetoothAdapter.STATE_CONNECTED ==bluetoothAdapter.getState()) {
+//                    Log.d(TAG, "STATE_CONNECTED");
+//                }
+//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);  
+//                switch (device.getBondState()) {  
+//                case BluetoothDevice.BOND_BONDING:  
+//                    Log.d("BlueToothTestActivity", "BOND_BONDING......");  
+//                    break;  
+//                case BluetoothDevice.BOND_BONDED:  
+//                    Log.d("BlueToothTestActivity", "BOND_BONDED");  
+//                    connectToDevices(device);
+//                    break;  
+//                case BluetoothDevice.BOND_NONE:  
+//                    Log.d("BlueToothTestActivity", "cancel BOND_NONE");  
+//                default:  
+//                    break;  
+//                }  
+//            }
+            
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                Log.d(TAG, "ACTION_FOUND"); 
+            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+                Log.d(TAG, "ACTION_BOND_STATE_CHANGED"); 
+            } else if (BluetoothAdapter.ACTION_SCAN_MODE_CHANGED.equals(action)) {
+                Log.d(TAG, "ACTION_SCAN_MODE_CHANGED"); 
+            } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                Log.d(TAG, "ACTION_STATE_CHANGED"); 
             }
 
-
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);  
+                switch (device.getBondState()) {
+                    case BluetoothDevice.BOND_BONDED:
+                        Log.d(TAG, "BOND_BONDED");  
+                        connectToDevices(device);
+                        break;  
+                    case BluetoothDevice.BOND_NONE:  
+                        Log.d(TAG, "cancel BOND_NONE");  
+                }
+            }
         }
     };
 
@@ -270,4 +301,23 @@ public class BlueToothConnect {
             e.printStackTrace();
         }
     }
+
+    public void close() {
+
+        try {
+            mContext.unregisterReceiver(broadcastReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (mBluetoothSocket !=null) {
+            try {
+                mBluetoothSocket.close();
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

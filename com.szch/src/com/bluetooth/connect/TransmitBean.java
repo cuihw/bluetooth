@@ -18,5 +18,5 @@ public class TransmitBean implements Serializable{
 	public String getMsg() {
 		return this.msg;
 	}
-	
+
 }

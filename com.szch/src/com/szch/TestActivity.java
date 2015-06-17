@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bluetooth.connect.BlueToothConnect;
 import com.szch.data.PreferencesData;
@@ -76,6 +80,18 @@ public class TestActivity extends Activity {
 
         initView();
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBlueToothConnect.close();
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
         connectBluetoothDevice ();
     }
 
@@ -83,8 +99,9 @@ public class TestActivity extends Activity {
 
     private void connectBluetoothDevice() {
         mBlueToothConnect = BlueToothConnect.getInstence(this, mHandler);
+        mBlueToothConnect.init();
     }
-    
+
     Handler mHandler = new Handler() {
 
         @Override
@@ -95,11 +112,10 @@ public class TestActivity extends Activity {
                     fillData(data);
                     break;
                 case BlueToothConnect.NO_PAIRED_DEVICES:
-                    
+                    showNopairedDevices();
                     break;
             }
-            
-            
+
             super.handleMessage(msg);
         }
         
@@ -115,6 +131,18 @@ public class TestActivity extends Activity {
         mCarbonizeStrength = intent.getFloatExtra(PreferencesData.CARBONIZE, 0.0f);
         mFixStrength = intent.getIntExtra(PreferencesData.FIX_STRENGTH, 0);
         mDate = intent.getStringExtra(PreferencesData.DATE);
+    }
+
+    protected void showNopairedDevices() {
+
+        Toast toast = Toast.makeText(getApplicationContext(), "没有匹配的蓝牙设备！请打开蓝牙设备并匹配",
+                Toast.LENGTH_SHORT);
+
+        LinearLayout toastView = (LinearLayout) toast.getView();
+        ImageView imageCodeProject = new ImageView(getApplicationContext());
+        imageCodeProject.setImageResource(R.drawable.bluetooth);
+        toastView.addView(imageCodeProject, 0);
+        toast.show();
     }
 
     protected void fillData(int data) {
