@@ -10,14 +10,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,22 +25,22 @@ import android.widget.Toast;
 
 import com.bluetooth.connect.BlueToothConnect;
 import com.szch.data.PreferencesData;
+import com.szch.data.TestData;
 
 public class TestActivity extends Activity {
 
-    private String[] arrayData = {
-            "  _", "  _", "  _", "  _", 
-    		"  _", "  _", "  _", "  _",
-    		"  _", "  _", "  _", "  _",
+    protected static final int TSETDATA = 30;
+
+    private String[] arrayData = {"  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _",
             "  _", "  _", "  _", "  _"};
 
     GridView mGridview;
 
     SimpleAdapter mSimpleAdapter;
     GridViewAdpter mGridViewAdpter;
-    
-    private List<Integer> testdata = new ArrayList<Integer>();
-    
+
+    private TestData testdata = new TestData();
+
     TextView mTextViewTestArea;
 
     private String mConstructionName;
@@ -62,7 +60,7 @@ public class TestActivity extends Activity {
     private int mFixStrength;
 
     private String mDate;
-    
+
     private int mGridItemSelected = 0;
 
     ArrayList<HashMap<String, Object>> lstItem = new ArrayList<HashMap<String, Object>>();
@@ -92,7 +90,7 @@ public class TestActivity extends Activity {
     protected void onResume() {
 
         super.onResume();
-        connectBluetoothDevice ();
+        connectBluetoothDevice();
     }
 
     BlueToothConnect mBlueToothConnect;
@@ -102,11 +100,13 @@ public class TestActivity extends Activity {
         mBlueToothConnect.init();
     }
 
+
+
     Handler mHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what) {
+            switch (msg.what) {
                 case BlueToothConnect.READ_DATA:
                     int data = msg.arg1;
                     fillData(data);
@@ -114,11 +114,16 @@ public class TestActivity extends Activity {
                 case BlueToothConnect.NO_PAIRED_DEVICES:
                     showNopairedDevices();
                     break;
+
+                case TSETDATA:
+                    data = msg.arg1;
+                    fillData(data);
+                    break;
             }
 
             super.handleMessage(msg);
         }
-        
+
     };
 
     private void getTestParam(Intent intent) {
@@ -135,8 +140,7 @@ public class TestActivity extends Activity {
 
     protected void showNopairedDevices() {
 
-        Toast toast = Toast.makeText(getApplicationContext(), "没有匹配的蓝牙设备！请打开蓝牙设备并匹配",
-                Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), "没有匹配的蓝牙设备！请打开蓝牙设备并匹配", Toast.LENGTH_SHORT);
 
         LinearLayout toastView = (LinearLayout) toast.getView();
         ImageView imageCodeProject = new ImageView(getApplicationContext());
@@ -147,27 +151,17 @@ public class TestActivity extends Activity {
 
     protected void fillData(int data) {
 
-        if (testdata.size() > 15) {
-            testdata.remove(15);
+        if (testdata.data.length > 15) {
+            testdata.data[15] = data;
+            mGridItemSelected = 15;
+        } else if (mGridItemSelected <= testdata.data.length) {
+            testdata.data[mGridItemSelected] = data;
+            mGridItemSelected++;
+        } else if (mGridItemSelected > testdata.data.length) {
+            testdata.data[testdata.data.length] = data;
+            mGridItemSelected = testdata.data.length;
         }
 
-        if (mGridItemSelected < testdata.size()) {
-
-            testdata.add(mGridItemSelected, data);
-
-            if (mGridItemSelected < 15) {
-                mGridItemSelected ++;   
-            }
-
-        } else {
-            testdata.add(data);
-
-            mGridItemSelected = testdata.size();
-            if (mGridItemSelected > 15) {
-                testdata.add(mGridItemSelected, data);
-                mGridItemSelected = 15;
-            }
-        }
         setSelectItem(mGridItemSelected);
     }
 
@@ -205,10 +199,10 @@ public class TestActivity extends Activity {
     }
 
     @SuppressLint("UseSparseArrays")
-    public class GridViewAdpter  extends BaseAdapter  {
+    public class GridViewAdpter extends BaseAdapter {
         private LayoutInflater li;
-        
-        private int selected = 0; 
+
+        private int selected = 0;
 
         public GridViewAdpter(String[] arrayData) {
             li = LayoutInflater.from(TestActivity.this);
@@ -216,7 +210,7 @@ public class TestActivity extends Activity {
 
         List<View> viewGridList = new ArrayList<View>();
 
-        HashMap<Integer, View> viewGridMap = new HashMap<Integer, View> ();
+        HashMap<Integer, View> viewGridMap = new HashMap<Integer, View>();
 
         @Override
         public int getCount() {
@@ -275,6 +269,39 @@ public class TestActivity extends Activity {
         class ViewHolder {
             TextView textview;
         }
-
     }
+
+    // for test.
+    Thread mTestThread = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            while (true) {
+                Message msg = mHandler.obtainMessage(TSETDATA);
+                msg.arg1 = generatorTestData();
+                mHandler.sendMessage(msg);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    private void testData() {
+        mTestThread.start();
+    }
+
+    private void stopTest() {
+        mTestThread.stop();
+    }
+
+    private int generatorTestData() {
+        int Max = 95, Min = 70;
+        int ret = (int) Math.round(Math.random() * (Max - Min) + Min);
+        return ret;
+    }
+
 }
