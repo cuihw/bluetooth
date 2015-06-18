@@ -231,7 +231,6 @@ public class MainActivity extends Activity {
 
         saveDataPreferences();
 
-
         Intent intent = new Intent(this, TestActivity.class);
 
         setData(intent);

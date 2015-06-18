@@ -27,7 +27,9 @@
         <activity
             android:name="com.szch.TestActivity">
         </activity>
-        
+        <activity
+            android:name="com.szch.TestResultActivity">
+        </activity>
     </application>
 
 </manifest>

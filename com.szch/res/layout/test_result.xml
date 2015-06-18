@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        
+        android:id="@+id/table_head"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/xu_hao"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:text="序号"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/View1"
+            android:layout_width="0.5dp"
+            android:layout_height="fill_parent"
+            android:background="#000000"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/ping_jun"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:text="平均值"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/View2"
+            android:layout_width="0.5dp"
+            android:layout_height="fill_parent"
+            android:background="#000000"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/angle"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:text="角度修正"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/View3"
+            android:layout_width="0.5dp"
+            android:layout_height="fill_parent"
+            android:background="#000000"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/ce_mian"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:text="侧面修正"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/View4"
+            android:layout_width="0.5dp"
+            android:layout_height="fill_parent"
+            android:background="#000000"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tanhua"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:text="碳化修正"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/View5"
+            android:layout_width="0.5dp"
+            android:layout_height="fill_parent"
+            android:background="#000000"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:text="换算值"
+            android:textSize="20sp" />
+"
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/textView1"
+        android:layout_below="@+id/table_head" >
+    </ListView>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+		android:layout_alignParentBottom="true"
+        android:textSize="20sp"
+        android:text="强度最小值: \n强度平均值:\n强度标准差:\n强度推定值" />
+
+</RelativeLayout>

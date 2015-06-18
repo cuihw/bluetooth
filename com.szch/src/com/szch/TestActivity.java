@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +27,19 @@ import android.widget.Toast;
 import com.bluetooth.connect.BlueToothConnect;
 import com.szch.data.PreferencesData;
 import com.szch.data.TestData;
+import com.szch.data.TestDataTransmit;
 
 public class TestActivity extends Activity {
 
     protected static final int TSETDATA = 30;
 
-    private String[] arrayData = {"  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _", "  _",
-            "  _", "  _", "  _", "  _"};
+    public static final String TAG = "TestActivity";
+
+    private String[] arrayData = {
+            "", "", "", "", "",
+            "", "", "", "", "",
+            "", "", "", "", "",
+            "", "", "", "", ""};
 
     GridView mGridview;
 
@@ -63,7 +70,9 @@ public class TestActivity extends Activity {
 
     private int mGridItemSelected = 0;
 
-    ArrayList<HashMap<String, Object>> lstItem = new ArrayList<HashMap<String, Object>>();
+    List<TestData> dataList = new ArrayList<TestData>();
+
+    int mSavedNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +86,58 @@ public class TestActivity extends Activity {
         getTestParam(intent);
 
         initView();
+    }
+    
+    public void onClickSave(View view) {
+        if (checkValue()) {
+            dataList.add(testdata);
+            mSavedNumber = dataList.size();
+            testdata = new TestData();
 
+            if (mSavedNumber == mTestNumber) {
+                showTestResult();
+            } else {
+                // start test
+                // for test
+                testData();
+            }
+
+            mTextViewTestArea.setText("第" + (mSavedNumber + 1) + "测区");
+
+
+        } else {
+            Toast.makeText(this, "测试数据不完整！", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void showTestResult() {
+        Log.d(TAG, "show test result....");
+        setData();
+        Intent intent = new Intent(this, TestResultActivity.class);
+        startActivity(intent);
+    }
+
+    private void setData() {
+        TestDataTransmit.dataList = dataList;
+    }
+
+    private boolean checkValue() {
+        for (int i = 0; i < testdata.data.length; i++) {
+            if (testdata.data[i] == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        // for Test();
+        stopTest();
+
         mBlueToothConnect.close();
     }
 
@@ -91,6 +146,16 @@ public class TestActivity extends Activity {
 
         super.onResume();
         connectBluetoothDevice();
+
+        if (mSavedNumber == mTestNumber) {
+            dataList.clear();
+            mSavedNumber = dataList.size();
+            mTextViewTestArea.setText("第" + (mSavedNumber + 1) + "测区");
+        }
+
+        // for test
+        testData();
+        
     }
 
     BlueToothConnect mBlueToothConnect;
@@ -99,8 +164,6 @@ public class TestActivity extends Activity {
         mBlueToothConnect = BlueToothConnect.getInstence(this, mHandler);
         mBlueToothConnect.init();
     }
-
-
 
     Handler mHandler = new Handler() {
 
@@ -151,18 +214,36 @@ public class TestActivity extends Activity {
 
     protected void fillData(int data) {
 
-        if (testdata.data.length > 15) {
-            testdata.data[15] = data;
-            mGridItemSelected = 15;
-        } else if (mGridItemSelected <= testdata.data.length) {
-            testdata.data[mGridItemSelected] = data;
-            mGridItemSelected++;
-        } else if (mGridItemSelected > testdata.data.length) {
-            testdata.data[testdata.data.length] = data;
-            mGridItemSelected = testdata.data.length;
+        for (int i = 0; i < testdata.data.length; i++) {
+            if ((testdata.data[i] == 0)) {
+                if (mGridItemSelected <= i) {
+                    testdata.data[mGridItemSelected] = data;
+                    if (mGridItemSelected < (testdata.data.length-1 )) {
+                        mGridItemSelected ++;
+                    }
+                    break;
+                } else {
+                    mGridItemSelected = i;
+                    testdata.data[mGridItemSelected] = data;
+                    if (mGridItemSelected < (testdata.data.length-1 )) {
+                        mGridItemSelected ++;
+                    }
+                    break;
+                }
+            }
         }
 
-        setSelectItem(mGridItemSelected);
+        for (int i = 0; i < testdata.data.length; i++) {
+            if (testdata.data[i] != 0) {
+                arrayData[i] = "" + testdata.data[i];                
+            } else {
+                arrayData[i] = "_";
+            }
+        }
+        if (mGridItemSelected < 16) {
+            setSelectItem(mGridItemSelected);            
+        }
+
     }
 
     private void initView() {
@@ -178,6 +259,7 @@ public class TestActivity extends Activity {
         mGridViewAdpter = new GridViewAdpter(arrayData);
 
         mTextViewTestArea = (TextView) findViewById(R.id.test_area_index);
+        mTextViewTestArea.setText("第" + (mSavedNumber + 1) + "测区");
 
         mGridview.setAdapter(mGridViewAdpter);
 
@@ -194,7 +276,6 @@ public class TestActivity extends Activity {
 
         mGridViewAdpter.selectItem(index);
         mGridViewAdpter.notifyDataSetChanged();
-
         mGridItemSelected = index;
     }
 
@@ -242,9 +323,11 @@ public class TestActivity extends Activity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder vh = null;
+            //Log.d(TAG, "position = " + position);
+
             if (convertView == null) {
                 vh = new ViewHolder();
-                convertView = li.inflate(R.layout.grid_item, null);
+                convertView = li.inflate(R.layout.item_grid, null);
                 vh.textview = (TextView) convertView.findViewById(R.id.item_view);
                 convertView.setTag(vh);
             } else {
@@ -262,6 +345,9 @@ public class TestActivity extends Activity {
             }
 
             viewGridMap.put(position, convertView);
+            if (position > 15) {
+                convertView.setVisibility(View.GONE);
+            }
 
             return convertView;
         }
@@ -272,30 +358,41 @@ public class TestActivity extends Activity {
     }
 
     // for test.
-    Thread mTestThread = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-
-            while (true) {
-                Message msg = mHandler.obtainMessage(TSETDATA);
-                msg.arg1 = generatorTestData();
-                mHandler.sendMessage(msg);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    });
+    Thread mTestThread;
 
     private void testData() {
+        mTestThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                int count = 16;
+                while (0 < count--) {
+                    
+                    Message msg = mHandler.obtainMessage(TSETDATA);
+                    msg.arg1 = generatorTestData();
+                    mHandler.sendMessage(msg);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         mTestThread.start();
     }
 
+    @SuppressWarnings("deprecation")
     private void stopTest() {
-        mTestThread.stop();
+        
+        try {
+            if (mTestThread.isAlive()) {
+                mTestThread.interrupt();
+                mTestThread.stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int generatorTestData() {
