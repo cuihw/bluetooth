@@ -61,12 +61,12 @@ public class AlgorithmData {
             // 根据修正后的回弹值求出行数
             nR = 0;
             for (i = 1; i < CURVELINE - 1; i++) {
-                if (fR >= MIN_RM + (float) i * 0.2F)
+                if (fR >= MIN_RM + i * 0.2F)
                     nR++;
                 else
                     break;
             }
-            fR1 = MIN_RM + (float) nR * 0.2F;
+            fR1 = MIN_RM + nR * 0.2F;
             // 查强度换算表，获取换算强度值
             if ((Data[nR][nC] < 0.00000001F) | ((Data[nR + 1][nC] < 0.00000001F)))// 强度换算表中的空值
             {
@@ -75,7 +75,7 @@ public class AlgorithmData {
                 else
                     fVal = 60.1f;// MORE_THEN_SIXTY;
             } else {
-                fVal = (float) (Data[nR][nC] + ((fR - fR1) / 0.2F) * (Data[nR + 1][nC] - (Data[nR][nC])));
+                fVal = Data[nR][nC] + ((fR - fR1) / 0.2F) * (Data[nR + 1][nC] - (Data[nR][nC]));
             }
             fVal = GetFloatRound(fVal, 1);
         } else// 泵送
@@ -114,7 +114,7 @@ public class AlgorithmData {
                 else
                     fVal = 60.1f;// MORE_THEN_SIXTY;
             } else {
-                fVal = (float) (bengsong[nR][nC] + ((fR - fR1) / 0.2F) * (bengsong[nR + 1][nC] - bengsong[nR][nC]));
+                fVal = bengsong[nR][nC] + ((fR - fR1) / 0.2F) * (bengsong[nR + 1][nC] - bengsong[nR][nC]);
             }
             fVal = GetFloatRound(fVal, 1);
         }
@@ -148,15 +148,15 @@ public class AlgorithmData {
 
             nTmp = Integer.parseInt(tmpLast);
             if (nTmp % 2 != 0) {
-                val = (float) (int) (Math.abs(val) + 5);   
+                val = (int) (Math.abs(val) + 5);   
             } else {
-                val = (float) (int) (Math.abs(val) - 5);                
+                val = (int) (Math.abs(val) - 5);                
             }
 
         } else if (nTmp < 5) {
-            val = (float) (int) (Math.abs(val) - nTmp);
+            val = (int) (Math.abs(val) - nTmp);
         } else
-            val = (float) (int) (Math.abs(val) - nTmp + 10);
+            val = (int) (Math.abs(val) - nTmp + 10);
 
         if (fVal < 0)
             val = -val;

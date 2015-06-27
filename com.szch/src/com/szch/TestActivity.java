@@ -315,9 +315,12 @@ public class TestActivity extends Activity {
             selected = position;
 
             View convert = viewGridMap.get(position);
+            if (convert != null) {
 
-            ViewHolder vh = (ViewHolder) convert.getTag();
-            vh.textview.setBackgroundResource(R.drawable.item_selected);
+                ViewHolder vh = (ViewHolder) convert.getTag();
+                vh.textview.setBackgroundResource(R.drawable.item_selected);
+            }
+
         }
 
         @Override
