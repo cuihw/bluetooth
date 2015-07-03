@@ -133,10 +133,12 @@ public class AlgorithmData {
         val = fVal;
 
         for (i = 0; i <= bit0; i++) {
-            val = val * 10.F;            
+            val = val * 10.F;
         }
 
-        String strValue = "" + val;
+        int ival = (int)val;
+
+        String strValue = "" + ival;
 
         String tmpLast = strValue.substring(strValue.length() - 1);
 
