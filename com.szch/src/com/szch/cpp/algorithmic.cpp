@@ -22,6 +22,59 @@ void Sort(unsigned char *pf, int n)//排序
 	}
 }
 
+
+/* ËÄÉáÁùÈë£¬Ææ½øÅ¼²»½ø*/
+
+                        //test:  2.335 ,1
+float GetFloatRound(float fVal, int bit)
+{
+	float val = fVal;
+
+	for(int i=0; i<=bit; i++)
+		val = val * 10.F;
+
+	// test  val = 233.5  bit = 1
+
+	//int ival=(int)val;	//È¡Õû
+	//val=(float)ival;
+
+	char strTmp[20];
+	sprintf(strTmp, "%.0f", val);
+
+	int ival=(int)atoi(strTmp);	//取整 233
+
+	val=(float)ival;
+
+	_itoa(ival,strTmp,10);
+
+
+    // strTmp  tmpStr = 3
+	char tmpStr=strTmp[strlen(strTmp)-1];
+
+	int nTmp=tmpStr-48;  // 0x30 = 48
+
+	if(nTmp==5)
+	{
+		tmpStr=strTmp[strlen(strTmp)-2];
+		if(tmpStr%2!=0)
+			val=(float)(int)(fabs(val)+5);  // if 235 : 235 + 5 = 240
+		else
+			val=(float)(int)(fabs(val)-5);   // if 245 : 245 - 5 = 240
+	}
+	else if(nTmp<5)
+	{
+		val=(float)(int)(fabs(val)-nTmp);  // val = 233 - 3
+	}
+	else
+		val=(float)(int)(fabs(val)-nTmp+10);  // if 238 :  238 - 8 + 10 = 240
+
+	if(fVal<0) val=-val;  // add the singed mark
+
+	for(i=0; i<=bit; i++)
+		val = val / 10.F;
+	return val;
+}
+
 /******************************************************
 函数：四舍六入，奇进偶不进
 参数：fVal：实数
