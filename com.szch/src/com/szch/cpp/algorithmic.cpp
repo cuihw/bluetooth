@@ -87,7 +87,7 @@ float GetAngleCor(float R, int iAng)
 	
 	fRCor=0.0F;
 	//iR = 0;
-	for(i=0;i<R_ANG_NUM;i++)
+	for(i=1;i<R_ANG_NUM;i++)
 	{
 		if(R==fAveR[i])
 		{
@@ -122,7 +122,7 @@ float GetSurfCor(float R, int nSurf)
 	if(nSurf > 2)
 		return fRCor;
 	
-	for(i=0;i<R_SURF_NUM;i++)
+	for(i=1;i<R_SURF_NUM;i++)
 	{
 		fRCor=TestSurfCor[i-1][nSurf]+(R-fAveR[i-1])*(TestSurfCor[i][nSurf]-TestSurfCor[i-1][nSurf])/(fAveR[i]-fAveR[i-1]);
 	}
@@ -183,10 +183,11 @@ float GetRegStrg(float Cardepth, float Modval, char Pumpflag,char ht_jd0,char ht
 				break;
 		}
 		//根据修正后的回弹值求出行数
+
 		nR = 0;
-		for(i=1; i<CURVELINE-1; i++)
+		for (i = 1; i < CURVELINE - 1; i++)
 		{
-			if(fR >= MIN_RM+(float)i*0.2F)
+			if(fR >= MIN_RM + (float)i*0.2F)
 				nR ++;
 			else
 				break;
@@ -203,7 +204,7 @@ float GetRegStrg(float Cardepth, float Modval, char Pumpflag,char ht_jd0,char ht
 		else
 		{
 			fVal = (float)(Data[nR][nC]+((fR-fR1)/0.2F)*(Data[nR+1][nC]-(Data[nR][nC])));
-		}		
+		}
 		fVal=GetFloatRound(fVal,1);	
 	}
 	else//泵送
