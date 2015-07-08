@@ -9,6 +9,7 @@
         android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:textColor="#CD3700"
+        android:gravity="center"
         android:textSize="20sp" />
 
     <View

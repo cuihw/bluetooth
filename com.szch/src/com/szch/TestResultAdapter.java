@@ -8,6 +8,7 @@ import com.szch.data.TestDataTransmit;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 public class TestResultAdapter extends BaseAdapter {
+
+    private String TAG = "TestResultAdapter";
 
     private LayoutInflater li;
 
@@ -62,8 +65,9 @@ public class TestResultAdapter extends BaseAdapter {
         //Log.d(TAG, "position = " + position);
 
         if (convertView == null) {
+
             vh = new ViewHolder();
-            convertView = li.inflate(R.layout.item_grid, null);
+            convertView = li.inflate(R.layout.item_test_result, null);
             vh.textviewid = (TextView) convertView.findViewById(R.id.id);
             vh.textviewaverage = (TextView) convertView.findViewById(R.id.average);
             vh.textviewAngle = (TextView) convertView.findViewById(R.id.angle);
@@ -75,9 +79,12 @@ public class TestResultAdapter extends BaseAdapter {
             vh = (ViewHolder) convertView.getTag();
         }
         TestData data = dataList.get(position);
-        if (data != null) {
 
-            vh.textviewid.setText( "" + (position + 1));
+        if (data != null) {
+            if (vh == null) {
+                Log.d(TAG, "ViewHolder is null");
+            }
+            vh.textviewid.setText("" + (position + 1));
             vh.textviewaverage.setText( "" + data.average);
             vh.textviewAngle.setText("" + data.angleFix);
             vh.textviewSurface.setText( "" + data.surfaceFix);
@@ -85,7 +92,7 @@ public class TestResultAdapter extends BaseAdapter {
             vh.textviewResult.setText("" + data.result);
         }
 
-        convertView.setBackgroundColor(colors[position % 2]);  
+        convertView.setBackgroundColor(colors[(position +1) % 2]);  
         return convertView;
     }
 

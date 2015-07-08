@@ -20,15 +20,25 @@ public class Utils {
     }
 
     // 标准差
-    public double getStandardDevition(int[] array){
+    static public float getStandardDevition(float[] array){
+        if (array.length == 0) {
+            return 0;
+        }
+
         int num = array.length;
-        double sum = 0;
-        float average = computerAverage(array);
-        
-        for(int i = 0;i < num;i++){
-            sum += Math.sqrt(((double)array[i] -average) * (array[i] -average));
+        float sum = 0;
+
+        for (int i = 0; i < num; i++) {
+            sum += array[i];
+        }
+
+        float average = sum / num;
+
+        sum = 0;
+        for (int i = 0; i < num; i++) {
+            sum += Math.sqrt(((double) array[i] - average)
+                    * (array[i] - average));
         }
         return (sum / (num - 1));
     }
-
 }

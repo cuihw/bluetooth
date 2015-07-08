@@ -123,7 +123,9 @@ public class AlgorithmData {
         return fVal;
     }
     /******************************************************
-     * 函数：四舍六入，奇进偶不进 参数：fVal：实数 bit0：有效位数 返回值：0
+     * 函数：四舍六入，奇进偶不进 
+     * 参数：fVal：实数 bit0：有效位数 
+     * 返回值：0
      ***********************************************************/
     public static float getFloatRound(float fVal, int bit0) {
         float val;
@@ -140,6 +142,10 @@ public class AlgorithmData {
 
         String strValue = "" + ival;
 
+        if (strValue.length() < 1) {
+            return 0;
+        }
+
         String tmpLast = strValue.substring(strValue.length() - 1);
 
         Log.d(TAG, "Last bit is " + tmpLast);
@@ -147,13 +153,18 @@ public class AlgorithmData {
         nTmp = Integer.parseInt(tmpLast);
 
         if (nTmp == 5) {
+
+            if (strValue.length() < 2) {
+                return 0;
+            }
+
             tmpLast = strValue.substring(strValue.length() - 2, strValue.length() - 1);
 
             nTmp = Integer.parseInt(tmpLast);
             if (nTmp % 2 != 0) {
-                val = (int) (Math.abs(val) + 5);   
+                val = (int) (Math.abs(val) + 5);
             } else {
-                val = (int) (Math.abs(val) - 5);                
+                val = (int) (Math.abs(val) - 5);
             }
 
         } else if (nTmp < 5) {
@@ -164,8 +175,10 @@ public class AlgorithmData {
         if (fVal < 0)
             val = -val;
 
-        for (i = 0; i <= bit0; i++)
-            val = val / 10.F;
+        for (i = 0; i <= bit0; i++) {
+            val = val / 10.F;            
+        }
+
         return val;
     }
 
@@ -183,22 +196,25 @@ public class AlgorithmData {
             R = MIN_RM;
         else if(R > 50.F)
             R = 50.F;
-        
+
         fRCor = 0.F;
         if(surfaceIndex > 2)
             return fRCor;
+        
+        
 
-        for (i = 1; i < R_SURF_NUM; i++) {
-            fRCor = TestSurfCor[i - 1][surfaceIndex]
-                    + (R - fAveR[i - 1])
-                    * (TestSurfCor[i][surfaceIndex] - TestSurfCor[i - 1][surfaceIndex])
-                    / (fAveR[i] - fAveR[i - 1]);
+        for (i = 0; i < R_SURF_NUM; i++) {
+            if (R == fAveR[i]) {
+                fRCor=TestSurfCor[i][surfaceIndex];
+            } else if (R < fAveR[i]){
+                fRCor = TestSurfCor[i - 1][surfaceIndex]
+                        + (R - fAveR[i - 1])
+                        * (TestSurfCor[i][surfaceIndex] - TestSurfCor[i - 1][surfaceIndex])
+                        / (fAveR[i] - fAveR[i - 1]);
+            }
         }
 
         fRCor = getFloatRound(fRCor, 1);
-        // ftoa(fRCor,1,str0); //测试
-        // for(i=0;i<5;i++)
-        // send_uart(str0[i]);
         return fRCor;
     }
 
@@ -220,13 +236,12 @@ public class AlgorithmData {
 
         fRCor = 0.0F;
 
-        for (i = 1; i < R_ANG_NUM; i++) {
+        for (i = 0; i < R_ANG_NUM; i++) {
             if (R == fAveR[i]) {
                 fRCor = TestAngCor[i][iAng];
                 break;
             } else if (R < fAveR[i]) {
-                fRCor =
-                        TestAngCor[i - 1][iAng] + (R - fAveR[i - 1]) * (TestAngCor[i][iAng] - TestAngCor[i - 1][iAng])
+                fRCor = TestAngCor[i - 1][iAng] + (R - fAveR[i - 1]) * (TestAngCor[i][iAng] - TestAngCor[i - 1][iAng])
                                 / (fAveR[i] - fAveR[i - 1]);
                 break;
             }
@@ -286,7 +301,8 @@ public class AlgorithmData {
 
     };
 
-    public static float[][] TestAngCor = { {-6.0f, -5.0f, -4.0f, -3.0f, 0.f, 2.5f, 3.0f, 3.5f, 4.0f},
+    public static float[][] TestAngCor = {
+            {-6.0f, -5.0f, -4.0f, -3.0f, 0.f, 2.5f, 3.0f, 3.5f, 4.0f},
             {-5.9f, -4.9f, -4.0f, -3.0f, 0.f, 2.5f, 3.0f, 3.5f, 4.0f},
             {-5.8f, -4.8f, -3.9f, -2.9f, 0.f, 2.4f, 2.9f, 3.4f, 3.9f},
             {-5.7f, -4.7f, -3.9f, -2.9f, 0.f, 2.4f, 2.9f, 3.4f, 3.9f},
@@ -316,7 +332,8 @@ public class AlgorithmData {
             {-3.7f, -3.2f, -2.7f, -1.7f, 0.f, 1.2f, 1.7f, 2.2f, 2.7f},
             {-3.6f, -3.1f, -2.6f, -1.6f, 0.f, 1.1f, 1.6f, 2.1f, 2.6f},
             {-3.6f, -3.1f, -2.6f, -1.6f, 0.f, 1.1f, 1.6f, 2.1f, 2.6f},
-            {-3.5f, -3.0f, -2.5f, -1.5f, 0.f, 1.0f, 1.5f, 2.0f, 2.5f}};
+            {-3.5f, -3.0f, -2.5f, -1.5f, 0.f, 1.0f, 1.5f, 2.0f, 2.5f}
+        };
 
     public static float[][] Data = { {10.3f, 10.1f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
             {10.5f, 10.3f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
