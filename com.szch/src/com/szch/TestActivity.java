@@ -6,10 +6,12 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +76,8 @@ public class TestActivity extends Activity {
     List<TestData> dataList = new ArrayList<TestData>();
 
     int mSavedNumber;
+    
+    PowerManager.WakeLock wl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +91,9 @@ public class TestActivity extends Activity {
         getTestParam(intent);
 
         initView();
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+        wl.acquire();//申请锁这个里面会调用PowerManagerService里面acquireWakeLock()
     }
     
     public void onClickSave(View view) {
@@ -121,7 +128,7 @@ public class TestActivity extends Activity {
             } else {
                 // start test
                 // for test
-                testData();
+                // testData();
             }
 
             mTextViewTestArea.setText("第" + (mSavedNumber + 1) + "测区");
@@ -176,9 +183,18 @@ public class TestActivity extends Activity {
         }
 
         // for test
-        testData();
-        
+        // testData();
+
     }
+    
+
+    @Override
+    protected void onDestroy() {
+
+        wl.release();
+        super.onDestroy();
+    }
+
 
     BlueToothConnect mBlueToothConnect;
 
@@ -187,6 +203,7 @@ public class TestActivity extends Activity {
         mBlueToothConnect.init();
     }
 
+    @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
 
         @Override
@@ -259,13 +276,13 @@ public class TestActivity extends Activity {
 
         for (int i = 0; i < testdata.data.length; i++) {
             if (testdata.data[i] != 0) {
-                arrayData[i] = "" + testdata.data[i];                
+                arrayData[i] = "" + testdata.data[i];
             } else {
                 arrayData[i] = "_";
             }
         }
         if (mGridItemSelected < 16) {
-            setSelectItem(mGridItemSelected);            
+            setSelectItem(mGridItemSelected);
         }
 
     }

@@ -33,7 +33,6 @@ public class BlueToothConnect {
 
     private static final UUID MY_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
-                       //00001101-0000-1000-8000-00805F9B34FB"
 
     private static final String NAME_SECURE = "name_secure";
 
@@ -181,10 +180,18 @@ public class BlueToothConnect {
                                 Log.d(TAG, "buffer [" + i + "] = " + buffer[i]);
                             }
 
+                            int value = 0;
+                            if (buffer.length > 2) {
+                                value = ((int)buffer[0]) * 10 + (int)buffer[0]; 
+                            } else if (buffer.length == 1){
+                                value  = (int)buffer[0];
+                            }
+
+                            notifyNewData(value);
+
                             Log.d(TAG, "buffer = " + new String(buffer));
                         }
                         
-                        notifyNewData();
                     }
 
                 } catch (IOException e) {
@@ -204,9 +211,9 @@ public class BlueToothConnect {
 
     }
 
-    private void notifyNewData() {
+    private void notifyNewData(int value) {
         Message msg = mHandler.obtainMessage(READ_DATA);
-        msg.arg1 = 80;
+        msg.arg1 = value;
         mHandler.sendMessage(msg);
     }
 
